@@ -55,6 +55,7 @@ ENV NODE_ENV=production
 # The node:22-bookworm image includes a 'node' user (uid 1000)
 # This reduces the attack surface by preventing container escape via root privileges
 # USER node
+USER root
 # Temporarily disabled to allow Sliplane persistent volume access
 
 # Ensure OpenClaw uses the original state directory even when running as root
