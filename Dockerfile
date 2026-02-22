@@ -9,6 +9,12 @@ RUN corepack enable
 WORKDIR /app
 RUN chown node:node /app
 
+# Install gog (Google Workspace CLI) for Calendar Pareto management
+RUN curl -L "https://github.com/steipete/gogcli/releases/download/v0.11.0/gogcli_0.11.0_linux_amd64.tar.gz" -o gog.tar.gz && \
+  tar -xzf gog.tar.gz gog && \
+  mv gog /usr/local/bin/gog && \
+  rm gog.tar.gz
+
 ARG OPENCLAW_DOCKER_APT_PACKAGES=""
 RUN apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3 python3-venv $OPENCLAW_DOCKER_APT_PACKAGES && \
