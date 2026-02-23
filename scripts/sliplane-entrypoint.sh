@@ -21,6 +21,12 @@ if [ -n "$GOG_OAUTH_TOKEN" ] && [ -n "$GOG_OAUTH_CREDENTIALS" ]; then
     gog auth keyring file
     
     # Set credentials using CLI to ensure proper registration
+    # Basic validation for common misconfiguration (missing root object)
+    if [[ ! "$GOG_OAUTH_CREDENTIALS" =~ \"installed\" && ! "$GOG_OAUTH_CREDENTIALS" =~ \"web\" ]]; then
+        echo "[openclaw] WARNING: GOG_OAUTH_CREDENTIALS does not appear to contain the required 'installed' or 'web' wrapper."
+        echo "[openclaw] Expected format: { \"installed\": { \"client_id\": \"...\", ... } }"
+    fi
+
     echo "$GOG_OAUTH_CREDENTIALS" | gog auth credentials set -
     
     # Import token using CLI
