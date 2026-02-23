@@ -34,6 +34,10 @@ if [ -n "$GOG_OAUTH_TOKEN" ] && [ -n "$GOG_OAUTH_CREDENTIALS" ]; then
     rm /tmp/gog_token.json
     
     echo "[openclaw] GOG authentication injected successfully."
+    
+    # Pre-configure the gog skill so the bot has access to the tools
+    echo "[openclaw] Enabling the gog skill in OpenClaw..."
+    node /app/openclaw.mjs skills enable gog || true
 fi
 
 # If we are running as root (Sliplane default for some plans), 1
