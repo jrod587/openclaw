@@ -16,19 +16,22 @@ if [ -n "$GOG_OAUTH_TOKEN" ] && [ -n "$GOG_OAUTH_CREDENTIALS" ]; then
     export XDG_CONFIG_HOME="$STATE_DIR"
     mkdir -p "$XDG_CONFIG_HOME/gogcli"
     
-    # Write variables to temporary files
-    echo "$GOG_OAUTH_CREDENTIALS" > /tmp/gog_credentials.json
+    # Write credentials directly to bypassing validation of raw GCP json format
+    # gog's internal format is slightly different than raw GCP
+    echo "$GOG_OAUTH_CREDENTIALS" > "$XDG_CONFIG_HOME/gogcli/credentials.json"
+    
+    # Write token variable to a temporary file
     echo "$GOG_OAUTH_TOKEN" > /tmp/gog_token.json
     
     # Explicitly configure file keyring to ensure persistent, headless operation
+    export GOG_KEYRING_PASSWORD="openclaw_internal_keyring_pass"
     gog auth keyring file
     
-    # Import credentials and token using gog
-    gog auth credentials set /tmp/gog_credentials.json
+    # Import token using gog
     gog auth tokens import /tmp/gog_token.json
 
     # Clean up
-    rm /tmp/gog_credentials.json /tmp/gog_token.json
+    rm /tmp/gog_token.json
     
     echo "[openclaw] GOG authentication injected successfully."
 fi
