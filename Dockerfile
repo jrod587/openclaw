@@ -47,6 +47,15 @@ RUN if [ -n "$OPENCLAW_INSTALL_BROWSER" ]; then \
   rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*; \
   fi
 
+# Install gcloud CLI (required for Gmail Pub/Sub setup)
+USER root
+RUN apt-get update && apt-get install -y apt-transport-https ca-certificates gnupg curl && \
+  curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg && \
+  echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+  apt-get update && apt-get install -y google-cloud-sdk && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
+
 USER node
 COPY --chown=node:node . .
 RUN pnpm build
@@ -56,12 +65,11 @@ RUN pnpm ui:build
 
 ENV NODE_ENV=production
 
-# Security hardening: Run as non-root user
-# The node:22-bookworm image includes a 'node' user (uid 1000)
-# This reduces the attack surface by preventing container escape via root privileges
-# USER node
+# Security hardening: Ensure the node user owns the state directory
+# This fixes the EACCES errors found in Sliplane logs
 USER root
-# Temporarily disabled to allow Sliplane persistent volume access
+RUN mkdir -p /home/node/.openclaw && chown -R node:node /home/node/.openclaw
+USER node
 
 # Ensure OpenClaw uses the original state directory even when running as root
 ENV OPENCLAW_STATE_DIR=/home/node/.openclaw
