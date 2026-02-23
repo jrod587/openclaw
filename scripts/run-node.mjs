@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-import { spawn, spawnSync } from "node:child_process";
+import * as childProcess from "node:child_process";
+const spawn = childProcess.spawn;
+const spawnSync = childProcess.spawnSync;
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
@@ -225,6 +227,10 @@ export async function runNodeMain(params = {}) {
   deps.buildStampPath = path.join(deps.distRoot, ".buildstamp");
   deps.srcRoot = path.join(deps.cwd, "src");
   deps.configFiles = [path.join(deps.cwd, "tsconfig.json"), path.join(deps.cwd, "package.json")];
+
+  if (deps.env.OPENCLAW_SKIP_BUILD === "1") {
+    return await runOpenClaw(deps);
+  }
 
   if (!shouldBuild(deps)) {
     return await runOpenClaw(deps);
