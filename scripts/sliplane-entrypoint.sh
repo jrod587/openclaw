@@ -14,25 +14,18 @@ if [ -n "$GOG_OAUTH_TOKEN" ] && [ -n "$GOG_OAUTH_CREDENTIALS" ]; then
     
     # Ensure gogcli configuration folder exists
     export XDG_CONFIG_HOME="$STATE_DIR"
-    mkdir -p "$XDG_CONFIG_HOME/gogcli"
-    
-    # Write credentials directly to bypassing validation of raw GCP json format
-    # gog's internal format is slightly different than raw GCP
-    echo "$GOG_OAUTH_CREDENTIALS" > "$XDG_CONFIG_HOME/gogcli/credentials.json"
-    
-    # Write token variable to a temporary file
-    echo "$GOG_OAUTH_TOKEN" > /tmp/gog_token.json
+    mkdir -p "$XDG_CONFIG_HOME"
     
     # Explicitly configure file keyring to ensure persistent, headless operation
     export GOG_KEYRING_PASSWORD="openclaw_internal_keyring_pass"
     gog auth keyring file
     
-    # Import token using gog
-    gog auth tokens import /tmp/gog_token.json
-
-    # Clean up
-    rm /tmp/gog_token.json
+    # Set credentials using CLI to ensure proper registration
+    echo "$GOG_OAUTH_CREDENTIALS" | gog auth credentials set -
     
+    # Import token using CLI
+    echo "$GOG_OAUTH_TOKEN" | gog auth tokens import -
+
     echo "[openclaw] GOG authentication injected successfully."
     
     # Pre-configure the gog skill so the bot has access to the tools
