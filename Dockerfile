@@ -68,11 +68,11 @@ ENV NODE_ENV=production
 # Security hardening: Ensure the node user owns the state directory
 # This fixes the EACCES errors found in Sliplane logs
 USER root
-RUN mkdir -p /home/node/.openclaw && chown -R node:node /home/node/.openclaw
+RUN mkdir -p /app/storage && chown -R node:node /app/storage
 USER node
 
 # Ensure OpenClaw uses the original state directory even when running as root
-ENV OPENCLAW_STATE_DIR=/home/node/.openclaw
+ENV OPENCLAW_STATE_DIR=/app/storage
 
 # Expose port so Sliplane automatically routes health checks correctly
 EXPOSE 8080
@@ -83,4 +83,4 @@ EXPOSE 8080
 # For container platforms requiring external health checks:
 #   1. Set OPENCLAW_GATEWAY_TOKEN or OPENCLAW_GATEWAY_PASSWORD env var
 #   2. Override CMD: ["node","openclaw.mjs","gateway","--allow-unconfigured","--bind","lan"]
-CMD ["node", "openclaw.mjs", "gateway", "--allow-unconfigured", "--bind", "lan", "--port", "8080"]
+CMD ["node", "openclaw.mjs", "gateway", "--allow-unconfigured", "--bind", "lan", "--port", "8080", "--state-dir", "/app/storage"]
