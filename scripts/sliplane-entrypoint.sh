@@ -53,14 +53,12 @@ if [ -n "$GOG_OAUTH_TOKEN" ] && [ -n "$GOG_OAUTH_CREDENTIALS" ]; then
 
         echo "[openclaw] GOG authentication injected successfully."
         
-        # Pre-configure the gog skill
-        node /app/openclaw.mjs skills enable gog || true
-
         echo "[openclaw] Configuring default model and workspace skills..."
         # Ensure model is redirected to OpenRouter to avoid direct Anthropic key requirement
         node /app/openclaw.mjs config set agents.defaults.model.primary openrouter/anthropic/claude-3.5-sonnet || true
         # Ensure workspace skills are loaded from the app container path
         node /app/openclaw.mjs config set skills.load.extraDirs '["/app/skills"]' || true
+
     ) || echo "[openclaw] WARNING: GOG authentication setup failed. The server will start, but GOG tools may be unavailable."
 fi
 
